@@ -6,7 +6,7 @@ void setup() {
     char *dk = "DK won";
     for (int i = 0; *dk != '\0'; dk++, i++) {
         Serial.println(i);
-        EEPROM.read(i, *dk);
+        EEPROM.write(i, *dk);
     }
 }
 
