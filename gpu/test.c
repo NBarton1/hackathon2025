@@ -4,8 +4,8 @@
 
 #define CHECK(err, msg) \
 if (err != CL_SUCCESS) { \
-fprintf(stderr, "%s failed with error %d\n", msg, err); \
-exit(1); \
+    fprintf(stderr, "%s failed with error %d\n", msg, err); \
+    exit(1); \
 }
 
 int main() {
