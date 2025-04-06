@@ -124,6 +124,7 @@ int get_password_hash() {
 }
 
 int enter_password() {
+  lcd.setCursor(6, 1);
   byte pass[PASS_LEN];
   int hash = 0;
   for (int i=0; i<PASS_LEN; i++) {
@@ -149,11 +150,15 @@ void set_password() {
     return;
   }
 
+  lcd_clear_print("New Password:");
   int hash = enter_password();
   for (int i=0; i<2; i++)
     EEPROM.write(i, hash >> (i << 3));
 
   Serial.println("Password changed");
+  lcd_clear_print("Password changed");
+  delay(2000);
+  lcd_clear_print("Welcome, Admin");;
 }
 
 void login_mode() {
@@ -189,7 +194,6 @@ void loop() {
   bool scanned = false;
 
   lcd_clear_print("Enter Password: ");
-  lcd.setCursor(6, 1);
 
   while (!scanned && key != '*') {
     key = keypad.getKey();
