@@ -3,7 +3,7 @@
 #include <EEPROM.h>
 #include <Keypad.h>
 
-// #define SET_INITIAL_PASS
+#define SET_INITIAL_PASS
 #define SS_PIN 53
 #define RST_PIN 21
 
@@ -51,7 +51,8 @@ void setup() {
 #ifdef SET_INITIAL_PASS
     int hash = enter_password();
     for (int i=0; i<2; i++)
-      EEPROM.write(i, hash << (i << 3));
+      EEPROM.write(i, hash >> (i << 3));
+    Serial.println("Initial Password set");
 #endif
 }
 
@@ -93,7 +94,7 @@ void set_password() {
 
   int hash = enter_password();
   for (int i=0; i<2; i++)
-    EEPROM.write(i, hash << (i << 3));
+    EEPROM.write(i, hash >> (i << 3));
 
   Serial.println("Password changed");
 }
