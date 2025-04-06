@@ -3,10 +3,16 @@
 #include <EEPROM.h>
 #include <Keypad.h>
 
+// #define SET_INITIAL_PASS
 #define SS_PIN 53
-#define RST_PIN 5
+#define RST_PIN 21
 
-const byte PASS_LEN = 4;
+#define LOGOUT 'D'
+#define SET_PASS '#'
+
+#define PASS_LEN 4
+#define UID_LEN 4
+
 byte primes[] = { 2, 3, 5, 7 };
 
 const byte ROWS = 4;  //four rows
@@ -23,11 +29,8 @@ byte colPins[COLS] = { 23, 25, 27, 29 };  //connect to the column pinouts of the
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
-const char LOGOUT_KEY = 'D';
-
 MFRC522 rfid(SS_PIN, RST_PIN);
 
-const size_t UID_LEN = 4;
 byte admin_uid[UID_LEN] = {0xD9, 0xAE, 0xD6, 0x00};
 
 enum session_state {
@@ -45,9 +48,11 @@ void setup() {
   SPI.begin();
   rfid.PCD_Init();
 
-  // int hash = enter_password();
-  // for (int i=0; i<2; i++)
-  //   EEPROM.write(i, hash << (i << 3));
+#ifdef SET_INITIAL_PASS
+    int hash = enter_password();
+    for (int i=0; i<2; i++)
+      EEPROM.write(i, hash << (i << 3));
+#endif
 }
 
 void read_card() {
@@ -80,18 +85,32 @@ void attempt_login() {
 }
 
 void set_password() {
-  if (state != ADMIN_LOGGED_IN) return;
+  Serial.println("Setting password");
+  if (state != ADMIN_LOGGED_IN) {
+    Serial.println("You're too mid to change the password");
+    return;
+  }
 
   int hash = enter_password();
   for (int i=0; i<2; i++)
     EEPROM.write(i, hash << (i << 3));
+
+  Serial.println("Password changed");
 }
 
-// void login_mode() {
-//   if (key == '#') {
-//     set_password();
-//   }
-// }
+void login_mode() {
+  char key = '\0';
+
+  while (key != LOGOUT) {
+    key = keypad.getKey();
+    switch (key) {
+      case SET_PASS:
+        set_password();
+        break;
+
+    }
+  }
+}
 
 void loop() {
   state = LOGGED_OUT;
@@ -113,6 +132,7 @@ void loop() {
 
   if (state != LOGGED_OUT) {
     Serial.println("Dk won");
+    login_mode();
   } else {
     Serial.println("You're mid");
   }
@@ -120,5 +140,4 @@ void loop() {
   Serial.println(state);
 
   delay(2000);
-
 }
