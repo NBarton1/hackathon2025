@@ -1,3 +1,5 @@
+# Arduino Login System
+
 ## Inspiration
 We recently got an Arduino kit but had not gotten the chance to try it out yet, so we wanted to gain experience with Arduino at this hackathon.
 
